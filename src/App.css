@@ -1,0 +1,80 @@
+/* Reset some default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #303446;
+  color: #f2d5cf;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 4rem;
+  color: #f2d5cf;
+  margin-top: 20px;
+  animation: fadeIn 5s ease-in-out;
+}
+
+.coffee-icon {
+  font-size: 6rem;
+  color: #f2d5cf;
+}
+
+.wave-container {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  /* height: 20vw; */
+  z-index: 1;
+  overflow: hidden;
+  animation: slideUp 3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
