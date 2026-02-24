@@ -133,24 +133,28 @@
 
           float f = fbm(st+r);
 
-          // Dark coffee colors formulation
-          vec3 color = mix(
-              vec3(0.05, 0.05, 0.05), // very dark charcoal space
-              vec3(0.18, 0.11, 0.08), // dark espresso base
-              clamp((f*f)*4.0, 0.0, 1.0)
-          );
+          // Natural brewed coffee colors formulation
+          vec3 deepBase = vec3(0.015, 0.008, 0.004); // pure dark liquid coffee
+          vec3 coffeeBody = vec3(0.12, 0.05, 0.02);  // rich, dark amber body
+          vec3 cremaEdge = vec3(0.45, 0.28, 0.15);   // softer, golden brown edges
+          vec3 foamHighlight = vec3(0.70, 0.55, 0.40); // natural foam catching light
 
-          color = mix(
-              color,
-              vec3(0.08, 0.04, 0.03), // deep coffee folds
-              clamp(length(q), 0.0, 1.0)
-          );
-          
-          color = mix(
-              color,
-              vec3(0.25, 0.16, 0.12), // lighter crema edge movement
-              clamp(length(r.x) * 0.5, 0.0, 1.0)
-          );
+          // 1. Create the primary liquid body
+          float bodyMix = smoothstep(0.1, 0.8, f);
+          vec3 color = mix(deepBase, coffeeBody, bodyMix);
+
+          // 2. Add swirling depth (pulling back to dark)
+          float depthMix = smoothstep(0.1, 0.9, length(q));
+          color = mix(color, deepBase, depthMix * 0.7);
+
+          // 3. Blend in the flowing crema/edges
+          float cremaMix = smoothstep(0.4, 1.1, length(r.x));
+          color = mix(color, cremaEdge, cremaMix * 0.85);
+
+          // 4. Smooth, natural highlights that blend natively
+          // Multiply fluid structures to find fluid peaks instead of sharp cutoffs
+          float highlightMix = smoothstep(0.65, 1.3, f * length(r) * 2.8);
+          color = mix(color, foamHighlight, highlightMix * 0.65);
 
           gl_FragColor = vec4(color, 1.0);
       }
