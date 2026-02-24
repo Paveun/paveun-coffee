@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import * as THREE from 'three';
+  import { onMount, onDestroy } from "svelte";
+  import * as THREE from "three";
 
   let canvas: HTMLCanvasElement;
   let animationId: number;
@@ -11,19 +11,30 @@
   onMount(() => {
     // Setup Three.js
     const scene = new THREE.Scene();
-    
+
     // Orthographic camera for 2D shader background
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
     camera.position.z = 1;
 
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: false,
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Shader Material for dark fluid
     const uniforms = {
       u_time: { value: 0.0 },
-      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+      u_resolution: {
+        value: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      },
+      u_mouse: {
+        value: new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2),
+      },
+      u_click_pos: { value: new THREE.Vector2(-10000, -10000) },
+      u_click_time: { value: -100.0 },
     };
 
     const vertexShader = `
@@ -37,6 +48,9 @@
     const fragmentShader = `
       uniform float u_time;
       uniform vec2 u_resolution;
+      uniform vec2 u_mouse;
+      uniform vec2 u_click_pos;
+      uniform float u_click_time;
       varying vec2 vUv;
 
       // Random function
@@ -78,8 +92,28 @@
       }
 
       void main() {
-          vec2 st = gl_FragCoord.xy/u_resolution.xy;
+          vec2 st = vUv;
           st.x *= u_resolution.x/u_resolution.y;
+
+          // Interactive ripple based on mouse hover
+          vec2 mouse = u_mouse.xy / u_resolution.xy;
+          mouse.x *= u_resolution.x/u_resolution.y;
+          float distToMouse = distance(st, mouse);
+          st += (mouse - st) * exp(-distToMouse * 3.0) * 0.05; // Gentle pull towards mouse
+          
+          // Click expanding ripple
+          vec2 clickPos = u_click_pos.xy / u_resolution.xy;
+          clickPos.x *= u_resolution.x/u_resolution.y;
+          float distToClick = distance(st, clickPos);
+          float timeSinceClick = u_time - u_click_time;
+          
+          if (timeSinceClick > 0.0 && timeSinceClick < 5.0) {
+              float rippleRadius = timeSinceClick * 0.8; // Faster expanding
+              float rippleIntensity = exp(-timeSinceClick * 0.8); // Slower decay
+              float ring = sin((distToClick - rippleRadius) * 30.0); // Wider ring
+              float ringMask = exp(-abs(distToClick - rippleRadius) * 20.0);
+              st += normalize(st - clickPos + 0.0001) * ring * ringMask * rippleIntensity * 0.25; // Much stronger distortion
+          }
 
           vec2 q = vec2(0.);
           q.x = fbm( st + 0.00 * u_time);
@@ -119,7 +153,7 @@
       fragmentShader,
       uniforms,
       depthWrite: false,
-      depthTest: false
+      depthTest: false,
     });
 
     geometry = new THREE.PlaneGeometry(2, 2);
@@ -132,7 +166,35 @@
       uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
     };
 
-    window.addEventListener('resize', handleResize);
+    const handleMouseMove = (e: MouseEvent) => {
+      // Y-axis is inverted in WebGL
+      uniforms.u_mouse.value.set(e.clientX, window.innerHeight - e.clientY);
+    };
+    const handleMouseDown = (e: MouseEvent) => {
+      uniforms.u_click_pos.value.set(e.clientX, window.innerHeight - e.clientY);
+      uniforms.u_click_time.value = uniforms.u_time.value;
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("touchstart", (e) => {
+      uniforms.u_mouse.value.set(
+        e.touches[0].clientX,
+        window.innerHeight - e.touches[0].clientY,
+      );
+      uniforms.u_click_pos.value.set(
+        e.touches[0].clientX,
+        window.innerHeight - e.touches[0].clientY,
+      );
+      uniforms.u_click_time.value = uniforms.u_time.value;
+    });
+    window.addEventListener("touchmove", (e) => {
+      uniforms.u_mouse.value.set(
+        e.touches[0].clientX,
+        window.innerHeight - e.touches[0].clientY,
+      );
+    });
 
     const clock = new THREE.Clock(); // for smooth uniform time
 
@@ -145,7 +207,9 @@
     animate();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
     };
   });
 
@@ -201,11 +265,11 @@
   }
 
   h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: "Outfit", sans-serif;
     font-size: 8vw;
     font-weight: 300;
     letter-spacing: 0.1em;
-    color: #E8D8C8;
+    color: #e8d8c8;
     margin: 0;
     text-transform: uppercase;
     text-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
