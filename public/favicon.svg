@@ -1,0 +1,12 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="64" fill="#111111"/>
+  <!-- Mug Body -->
+  <path d="M68 84C68 84 68 152 68 168C68 185.673 82.3269 200 100 200H140C157.673 200 172 185.673 172 168C172 152 172 84 172 84" stroke="#E8D8C8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Top Rim -->
+  <ellipse cx="120" cy="84" rx="52" ry="16" stroke="#E8D8C8" stroke-width="16"/>
+  <!-- Handle -->
+  <path d="M172 108H192C205.255 108 216 118.745 216 132C216 145.255 205.255 156 192 156H172" stroke="#E8D8C8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Steam lines -->
+  <path d="M100 48C90 36 110 24 100 12" stroke="#E8D8C8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M140 48C130 36 150 24 140 12" stroke="#E8D8C8" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
