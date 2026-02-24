@@ -134,10 +134,10 @@
           float f = fbm(st+r);
 
           // Natural brewed coffee colors formulation
-          vec3 deepBase = vec3(0.015, 0.008, 0.004); // pure dark liquid coffee
-          vec3 coffeeBody = vec3(0.12, 0.05, 0.02);  // rich, dark amber body
-          vec3 cremaEdge = vec3(0.45, 0.28, 0.15);   // softer, golden brown edges
-          vec3 foamHighlight = vec3(0.70, 0.55, 0.40); // natural foam catching light
+          vec3 deepBase = vec3(0.04, 0.015, 0.005); // deepened, warmer brown base
+          vec3 coffeeBody = vec3(0.20, 0.08, 0.03);  // richer, auburn coffee body
+          vec3 cremaEdge = vec3(0.55, 0.35, 0.18);   // warmer, more golden crema
+          vec3 foamHighlight = vec3(0.85, 0.65, 0.45); // slightly brighter natural foam
 
           // 1. Create the primary liquid body
           float bodyMix = smoothstep(0.1, 0.8, f);
