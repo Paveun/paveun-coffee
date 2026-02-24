@@ -133,23 +133,23 @@
 
           float f = fbm(st+r);
 
-          // Dark coffee colors formulation
+          // Dark coffee colors formulation with high contrast
           vec3 color = mix(
-              vec3(0.05, 0.05, 0.05), // very dark charcoal space
-              vec3(0.18, 0.11, 0.08), // dark espresso base
-              clamp((f*f)*4.0, 0.0, 1.0)
+              vec3(0.02, 0.02, 0.02), // very deep charcoal space
+              vec3(0.18, 0.11, 0.08), // original dark espresso base
+              clamp((f*f)*5.5, 0.0, 1.0) // sharper transition
           );
 
           color = mix(
               color,
-              vec3(0.08, 0.04, 0.03), // deep coffee folds
-              clamp(length(q), 0.0, 1.0)
+              vec3(0.05, 0.02, 0.01), // deep, dark coffee folds
+              clamp(length(q)*1.5, 0.0, 1.0) // sharper contrast on folds
           );
           
           color = mix(
               color,
-              vec3(0.25, 0.16, 0.12), // lighter crema edge movement
-              clamp(length(r.x) * 0.5, 0.0, 1.0)
+              vec3(0.30, 0.18, 0.12), // punchy crema edge
+              clamp(length(r.x) * 0.9, 0.0, 1.0) // sharper transition for crema
           );
 
           gl_FragColor = vec4(color, 1.0);
@@ -210,7 +210,7 @@
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
-      uniforms.u_time.value = clock.getElapsedTime() * 0.5; // Scale time for slower movement
+      uniforms.u_time.value = clock.getElapsedTime() * 0.2; // Scale time for slower movement
       renderer.render(scene, camera);
     };
 
