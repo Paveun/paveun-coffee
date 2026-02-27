@@ -106,14 +106,14 @@
           mouse.x *= u_resolution.x/u_resolution.y;
           float distToMouse = distance(st, mouse);
           st += (mouse - st) * exp(-distToMouse * 3.0) * 0.05; // Gentle pull towards mouse
-          
+
           // Click expanding ripples
           for (int i = 0; i < 10; i++) {
               vec2 clickPos = u_clicks_pos[i].xy / u_resolution.xy;
               clickPos.x *= u_resolution.x/u_resolution.y;
               float distToClick = distance(st, clickPos);
               float timeSinceClick = u_time - u_clicks_time[i];
-              
+
               if (timeSinceClick > 0.0 && timeSinceClick < 5.0) {
                   float rippleRadius = timeSinceClick * 0.8; // Faster expanding
                   float rippleIntensity = exp(-timeSinceClick * 0.8); // Slower decay
@@ -179,7 +179,12 @@
     };
 
     let clickIndex = 0;
+    let lastClickTime = 0;
+    const CLICK_RATE_LIMIT_MS = 500;
     const addClick = (x: number, y: number) => {
+      const now = performance.now();
+      if (now - lastClickTime < CLICK_RATE_LIMIT_MS) return;
+      lastClickTime = now;
       uniforms.u_clicks_pos.value[clickIndex].set(x, window.innerHeight - y);
       uniforms.u_clicks_time.value[clickIndex] = uniforms.u_time.value;
       clickIndex = (clickIndex + 1) % MAX_RIPPLES;
